@@ -1,13 +1,18 @@
-VERSION = 2
-LIBRARY_NAME = pam_watchid.so
-DESTINATION = /usr/local/lib/pam
-TARGET = x86_64-apple-macosx10.15
+LIBRARY_NAME := pam_watchid.so
+DESTINATION := /usr/local/lib/pam
+ARCH := "$(shell uname -m)"
+MACOS_VERSION := "$(shell sw_vers -productVersion)"
+TRIPLE := "$(ARCH)-apple-macosx$(MACOS_VERSION)"
 
 all:
-	swiftc watchid-pam-extension.swift -o $(LIBRARY_NAME) -target $(TARGET) -emit-library
+	swiftc watchid-pam-extension.swift \
+		-target "$(TRIPLE)" \
+		-emit-library \
+		-O \
+		-o "$(LIBRARY_NAME)"
 
 install: all
-	mkdir -p $(DESTINATION)
-	cp $(LIBRARY_NAME) $(DESTINATION)/$(LIBRARY_NAME).$(VERSION)
-	chmod 444 $(DESTINATION)/$(LIBRARY_NAME).$(VERSION)
-	chown root:wheel $(DESTINATION)/$(LIBRARY_NAME).$(VERSION)
+	mkdir -p "$(DESTINATION)"
+	cp -f "$(LIBRARY_NAME)" "$(DESTINATION)/$(LIBRARY_NAME)"
+	chmod 444 "$(DESTINATION)/$(LIBRARY_NAME)"
+	chown root:wheel "$(DESTINATION)/$(LIBRARY_NAME)"
